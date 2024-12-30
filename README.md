@@ -1,0 +1,2 @@
+# AstroApp
+Simple Astrology Application
