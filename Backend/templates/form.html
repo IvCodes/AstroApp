@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: {{ '#1a1a2e' if enable_dark_mode else '#f4f4f9' }};
+            color: {{ '#ffffff' if enable_dark_mode else '#000000' }};
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: {{ '#16213e' if enable_dark_mode else 'white' }};
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label, input, select, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: {{ '#0f3460' if enable_dark_mode else '#007BFF' }};
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: {{ '#394867' if enable_dark_mode else '#0056b3' }};
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ app_title }}</h1>
+        <p>{{ app_description }}</p>
+        <form id="birthForm">
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+            
+            <label for="lagna">Lagna (Ascendant):</label>
+            <select id="lagna" name="lagna" required>
+                <option value="">Select Lagna</option>
+                <option value="Aries">Aries</option>
+                <option value="Taurus">Taurus</option>
+                <option value="Gemini">Gemini</option>
+                <option value="Cancer">Cancer</option>
+                <option value="Leo">Leo</option>
+                <option value="Virgo">Virgo</option>
+                <option value="Libra">Libra</option>
+                <option value="Scorpio">Scorpio</option>
+                <option value="Sagittarius">Sagittarius</option>
+                <option value="Capricorn">Capricorn</option>
+                <option value="Aquarius">Aquarius</option>
+                <option value="Pisces">Pisces</option>
+            </select>
+
+            <button type="button" onclick="calculateTime()">Calculate Birth Time</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+    async function calculateTime() {
+    const dob = document.getElementById('dob').value;
+    const lagna = document.getElementById('lagna').value;
+
+    if (!dob || !lagna) {
+        alert("Please provide both Date of Birth and Lagna");
+        return;
+    }
+
+    const response = await fetch('http://127.0.0.1:8000/calculate_time', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dob, lagna })
+    });
+
+    const resultDiv = document.getElementById('result');
+    if (response.ok) {
+        const data = await response.json(); // Parse JSON response
+        if (data.result) {
+            resultDiv.innerHTML = `<p><strong>Estimated Birth Time:</strong> ${data.result}</p>`;
+        } else if (data.error) {
+            resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+        }
+    } else {
+        resultDiv.innerHTML = `<p style="color: red;">Something went wrong. Please try again.</p>`;
+    }
+}
+
+
+    </script>
+</body>
+</html>
